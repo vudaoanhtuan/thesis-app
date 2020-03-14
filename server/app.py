@@ -1,10 +1,12 @@
 import os
 import json
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from model.predictor import Predictor
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello_word():
@@ -16,6 +18,7 @@ def get_prediction():
     text = request.json['text']
     pred = predict(text)
     res = {
+        "input": text,
         "predict": pred
     }
     return jsonify(res)
