@@ -8,6 +8,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Response from './Response'
 
 const axios = require('axios').default;
+const api_address = process.env['REACT_APP_API_ADDRESS'];
 
 class Form extends React.Component {
     render() {
@@ -48,7 +49,7 @@ class Form extends React.Component {
     show_response() {
         const e = document.getElementById("form-input-text");
         const text = e.value;
-        axios.post('http://localhost:5000/api', {
+        axios.post(api_address, {
             text: text
         })
         .then(function (response) {
