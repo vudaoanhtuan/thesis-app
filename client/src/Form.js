@@ -4,6 +4,7 @@ import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Response from './Response'
 
@@ -11,6 +12,38 @@ const axios = require('axios').default;
 const api_address = process.env['REACT_APP_API_ADDRESS'];
 
 class Form extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            input: null,
+            submit_button_available: true
+        }
+    }
+
+    inputChangeHandler(event) {
+        this.setState({
+            input: event.target.value,
+        })
+    }
+
+    show_response(event) {
+        const element = <CircularProgress/>
+        ReactDOM.render(element, document.getElementById("response"))
+        const text = this.state.input;
+        axios.post(api_address, {
+            text: text
+        })
+        .then(function (response) {
+            const input = response.data['input']
+            const pred = response.data['predict']
+            const element = <Response input={input} predict={pred}/>
+            ReactDOM.render(element, document.getElementById("response"))
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    }
+    
     render() {
         return (
             <Container maxWidth="md">
@@ -20,17 +53,21 @@ class Form extends React.Component {
                     placeholder="Input your text"
                     fullWidth
                     margin="normal"
-                    variant='outlined'
-                />
+                    variant="outlined"
+                    multiline={true}
+                    onChange={this.inputChangeHandler.bind(this)}
+                    />
                 </FormControl>
                 <Button 
                     variant="outlined" 
                     color="primary" 
                     size="large"
-                    onClick={() => this.show_response()}
+                    disabled={!this.state.submit_button_available}
+                    onClick={this.show_response.bind(this)}
                 >
                     Submit
                 </Button>
+                {' '}
                 <Button 
                     variant="outlined" 
                     color="primary" 
@@ -46,23 +83,6 @@ class Form extends React.Component {
         );
     }
 
-    show_response() {
-        const e = document.getElementById("form-input-text");
-        const text = e.value;
-        axios.post(api_address, {
-            text: text
-        })
-        .then(function (response) {
-            const input = response.data['input']
-            const pred = response.data['predict']
-            const element = <Response input={input} predict={pred}/>
-            ReactDOM.render(element, document.getElementById("response"))
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-
-    }
 }
 
 export default Form;
