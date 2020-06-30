@@ -13,7 +13,6 @@ function App() {
       </div>
       <br></br>
       <div id="response">
-
       </div>
     </div>
   );
