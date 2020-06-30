@@ -6,10 +6,6 @@ from .tokenizer import Tokenizer, load_tokenizer
 from .decode import greedy_decode, BeamDecode
 
 
-
-
-
-
 class Singleton(type):
     def __init__(cls, name, bases, attrs, **kwargs):
         super().__init__(name, bases, attrs)
@@ -57,5 +53,6 @@ class Predictor(metaclass=Singleton):
     def predict(self, text):
         return self.decoder.predict(text)
 
-
+    def predict_topk(self, text, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0):
+        return self.decoder.predict_topk(text, beam_size, max_len, pc_min_len, len_norm_alpha, alpha)
 

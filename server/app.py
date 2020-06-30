@@ -23,6 +23,19 @@ def get_prediction():
     }
     return jsonify(res)
 
+@app.route('/topk', methods=['POST'])
+def get_topk_prediction():
+    text = request.json['text']
+    preds = Predictor().predict_topk(text)
+    res = {}
+    for i, p in enumerate(preds):
+        res[str(i)] = {
+            "score": 10**p[0],
+            "text": p[1]
+        }
+    res['k'] = len(preds)
+    return jsonify(res)
+
 
 def init_predictor(config_path):
     with open(config_path) as f:

@@ -42,13 +42,14 @@ class BeamDecode():
             
         self.len_norm_alpha = len_norm_alpha
         self.pc_min_len = pc_min_len
-    
+
+
     def ix_to_sent(self, ixs):
         sent = [self.tokenizer.tgt_itos[x] for x in ixs]
         return ' '.join(sent)
 
-    def beam_search(self, src):
 
+    def beam_search_arg(self, src, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0, ):
         src_len = src.count(" ") + 1
         min_len = int(self.pc_min_len*src_len)
 
@@ -61,11 +62,10 @@ class BeamDecode():
         log_scores = [0]
         completed_sent = []
 
-        for ix in range(1, self.max_len):
+        for ix in range(1, max_len):
             tgt_mask = generate_square_subsequent_mask(ix) # TxT
-            tgt_mask
             ix_candidates = []
-            n_hyps = min(self.beam_size, len(hyps))
+            n_hyps = min(beam_size, len(hyps))
 
             for h in range(n_hyps):
                 tgt_inp = torch.tensor([hyps[h]], dtype=torch.long)
@@ -74,7 +74,7 @@ class BeamDecode():
                 h_prob = torch.softmax(h_logit, dim=-1)
                 h_prob = h_prob[0,-1,:]
                 h_log_prob = h_prob.log10()
-                k_val, k_idx = h_log_prob.topk(self.beam_size)
+                k_val, k_idx = h_log_prob.topk(beam_size)
                 k_val = k_val.numpy().tolist()
                 k_idx = k_idx.numpy().tolist()
 
@@ -87,9 +87,9 @@ class BeamDecode():
                     else:
                         sent = h_sent + " " + self.tokenizer.tgt_itos[ki]
                     lm_score = 0.0
-                    if self.lm:
+                    if self.lm and alpha > 0.00001:
                         lm_score = self.lm.score(sent, eos=False)
-                    combined_score = self.alpha * lm_score + (1-self.alpha) * (log_scores[h] + kv)
+                    combined_score = alpha * lm_score + (1-alpha) * (log_scores[h] + kv)
                     ix_candidates.append((combined_score, log_scores[h] + kv, h, ki))
 
             ix_candidates.sort(reverse=True)
@@ -98,12 +98,12 @@ class BeamDecode():
             new_log_score = []
             num_hyp = 0
             i = 0
-            while num_hyp < self.beam_size and i < len(ix_candidates):
+            while num_hyp < beam_size and i < len(ix_candidates):
                 i_combined_score, i_score, i_sent, i_word = ix_candidates[i]
                 h = hyps[i_sent].copy()
                 h.append(i_word)
                 if i_word == self.tokenizer.eos and ix > min_len: # eos at second token
-                    len_norm_score = ((5.0 + len(h)) / 6.0) ** self.len_norm_alpha
+                    len_norm_score = ((5.0 + len(h)) / 6.0) ** len_norm_alpha
                     completed_sent.append((i_combined_score / len_norm_score, h))
                 else:
                     new_hyps.append(h)
@@ -113,11 +113,16 @@ class BeamDecode():
 
             hyps = new_hyps
             log_scores = new_log_score
-            if len(completed_sent) > self.beam_size:
+            if len(completed_sent) > beam_size:
                 break
         completed_sent.sort(reverse=True)
-        return completed_sent[:self.beam_size]
-    
+        return completed_sent[:beam_size]
+
+
+    def beam_search(self, src):
+        return self.beam_search_arg(src, self.beam_size, self.max_len, self.pc_min_len, self.len_norm_alpha, self.alpha)
+
+
     def predict(self, src):
         pred = self.beam_search(src)[0][1][1:-1]
         sent = self.ix_to_sent(pred)
@@ -131,3 +136,11 @@ class BeamDecode():
         #         sent_seq = candidates[i][1][1:-1]
         #         sent = self.ix_to_sent(sent_seq)
         #         return sent
+
+    def predict_topk(self, src, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0):
+        preds = self.beam_search_arg(src, beam_size, max_len, pc_min_len, len_norm_alpha, alpha)
+        res = []
+        for score, tokens in preds:
+            text = self.ix_to_sent(tokens[1:-1])
+            res.append((score, text))
+        return res
