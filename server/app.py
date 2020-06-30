@@ -33,7 +33,6 @@ def get_topk_prediction():
             "score": 10**p[0],
             "text": p[1]
         }
-    res['k'] = len(preds)
     return jsonify(res)
 
 
