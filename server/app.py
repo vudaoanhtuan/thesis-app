@@ -26,7 +26,9 @@ def get_prediction():
 @app.route('/topk', methods=['POST'])
 def get_topk_prediction():
     text = request.json['text']
-    preds = Predictor().predict_topk(text)
+    lm_alpha = request.json['lm_alpha']
+    beam_size = request.json['beam_size']
+    preds = Predictor().predict_topk(text, beam_size=beam_size, alpha=lm_alpha)
     res = {}
     for i, p in enumerate(preds):
         res[str(i)] = {
