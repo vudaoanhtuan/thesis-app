@@ -37,11 +37,11 @@ const PercentSlider = withStyles({
       left: 'calc(-50% + 4px)',
     },
     track: {
-      height: 8,
+      height: 4,
       borderRadius: 4,
     },
     rail: {
-      height: 8,
+      height: 4,
       borderRadius: 4,
     },
   })(Slider);
@@ -50,7 +50,7 @@ class Form extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            input: null,
+            input: "",
             beam_size: 1,
             lm_alpha: 0.0,
             submit_button_available: true
@@ -96,6 +96,13 @@ class Form extends React.Component {
         });
     }
 
+    clear_button_clicked(event) {
+        this.setState({
+            input: ""
+        })
+        ReactDOM.render(null, document.getElementById("response"))
+    }
+
     render() {
         return (
             <Container maxWidth="md">
@@ -108,6 +115,7 @@ class Form extends React.Component {
                     variant="outlined"
                     multiline={true}
                     onChange={this.inputChangeHandler.bind(this)}
+                    value={this.state.input}
                     />
 
                 {/* <Typography align="left" variant="h5">Option</Typography> */}
@@ -147,10 +155,7 @@ class Form extends React.Component {
                     variant="outlined" 
                     color="primary" 
                     size="large"
-                    onClick={() => {
-                        const e = document.getElementById("form-input-text");
-                        e.value = "";
-                    }}
+                    onClick={this.clear_button_clicked.bind(this)}
                 >
                     Clear
                 </Button>
