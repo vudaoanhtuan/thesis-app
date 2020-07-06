@@ -136,11 +136,20 @@ class BeamDecode():
         #         sent_seq = candidates[i][1][1:-1]
         #         sent = self.ix_to_sent(sent_seq)
         #         return sent
+    
+    def post_process(self, src, pred):
+        src = src.split()
+        pred = pred.split()
+        for i in range(min(len(src), len(pred))):
+            if pred[i] == '[unk]':
+                pred[i] = src[i]
+        return ' '.join(pred)
 
     def predict_topk(self, src, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0):
         preds = self.beam_search_arg(src, beam_size, max_len, pc_min_len, len_norm_alpha, alpha)
         res = []
         for score, tokens in preds:
             text = self.ix_to_sent(tokens[1:-1])
+            text = self.post_process(src, text)
             res.append((score, text))
         return res
