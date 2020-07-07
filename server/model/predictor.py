@@ -46,6 +46,8 @@ class Predictor(metaclass=Singleton):
             len_norm_alpha=config['len_norm_alpha']
         )
 
+        print("Done!")
+
         self.tokenizer = tokenizer
         self.model = model
         self.decoder = beam_decoder
