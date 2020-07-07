@@ -11,5 +11,7 @@ services:
       context: ./client
       args: 
         - "API_ADDRESS=$API_ADDRESS"
+      depends_on:
+        - "server"
     ports: 
       - "3000:3000"
