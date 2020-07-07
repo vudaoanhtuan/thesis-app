@@ -33,7 +33,7 @@ class LanguageModel():
         if lm_path:
             self.lm = kenlm.Model(lm_path)
 
-    def score(self, text):
+    def score(self, sent):
         if self.lm:
             words_score = list(self.lm.full_scores(sent, eos=False))
             last_word_score = words_score[-1][0]
