@@ -164,11 +164,20 @@ class BeamDecode():
                 pred[i] = src[i]
         return ' '.join(pred)
 
-    def predict_topk(self, src, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0):
+    def predict_topk(self, src, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0,
+        post_process=True, re_scale=True):
         preds = self.beam_search_arg(src, beam_size, max_len, pc_min_len, len_norm_alpha, alpha)
         res = []
+        all_score = []
         for score, tokens in preds:
             text = self.ix_to_sent(tokens[1:-1])
-            text = self.post_process(src, text)
-            res.append((score, text))
+            if post_process:
+                text = self.post_process(src, text)
+            res.append([score, text])
+            all_score.append(score)
+        if re_scale:
+            fac = max(all_score)
+            fac = np.ceil(fac)
+            for i in range(len(res)):
+                res[i][0] -= fac
         return res
