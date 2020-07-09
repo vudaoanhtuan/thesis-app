@@ -107,7 +107,7 @@ class BeamDecode():
                         sent = h_sent + " " + self.tokenizer.tgt_itos[ki]
                     lm_score = 0.0
                     if self.lm and alpha > 0.00001:
-                        lm_score = self.lm.score(sent)
+                        lm_score = self.lm.score_sent(sent)
                     combined_score = alpha * lm_score + (1-alpha) * (log_scores[h] + kv)
                     ix_candidates.append((combined_score, log_scores[h] + kv, h, ki))
 
