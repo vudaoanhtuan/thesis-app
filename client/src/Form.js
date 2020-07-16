@@ -134,7 +134,7 @@ class Form extends React.Component {
                 <PercentSlider 
                     valueLabelDisplay="off" 
                     aria-labelledby="lm_alpha" 
-                    defaultValue={0.5} 
+                    defaultValue={50} 
                     scale={(x) => x / 100}
                     onChange={this.handleSliderLM.bind(this)}
                 />
