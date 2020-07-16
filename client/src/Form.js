@@ -51,8 +51,8 @@ class Form extends React.Component {
         super(props);
         this.state = {
             input: "",
-            beam_size: 1,
-            lm_alpha: 0.0,
+            beam_size: 3,
+            lm_alpha: 0.5,
             submit_button_available: true
         }
     }
