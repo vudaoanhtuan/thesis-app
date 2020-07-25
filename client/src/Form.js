@@ -52,7 +52,7 @@ class Form extends React.Component {
         this.state = {
             input: "",
             beam_size: 3,
-            lm_alpha: 0.5,
+            lm_alpha: 0.3,
             submit_button_available: true
         }
     }
@@ -134,7 +134,7 @@ class Form extends React.Component {
                 <PercentSlider 
                     valueLabelDisplay="off" 
                     aria-labelledby="lm_alpha" 
-                    defaultValue={50} 
+                    defaultValue={30} 
                     scale={(x) => x / 100}
                     onChange={this.handleSliderLM.bind(this)}
                 />
