@@ -8,6 +8,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -53,7 +55,8 @@ class Form extends React.Component {
             input: "",
             beam_size: 3,
             lm_alpha: 0.3,
-            submit_button_available: true
+            submit_button_available: true,
+            post_process: true
         }
     }
 
@@ -75,16 +78,24 @@ class Form extends React.Component {
         })
     };
 
+    handleSwitchPostProcess(event) {
+        this.setState({
+            post_process: !this.state.post_process
+        })
+    }
+
     show_response(event) {
         const element = <CircularProgress/>
         ReactDOM.render(element, document.getElementById("response"))
         const text = this.state.input;
         const lm_alpha = this.state.lm_alpha;
         const beam_size = this.state.beam_size;
+        const post_process = this.state.post_process;
         axios.post(api_address, {
             text: text,
             lm_alpha: lm_alpha,
-            beam_size: beam_size
+            beam_size: beam_size,
+            post_process: post_process
         })
         .then(function (response) {
             const pred = response.data
@@ -139,6 +150,17 @@ class Form extends React.Component {
                     onChange={this.handleSliderLM.bind(this)}
                 />
                 <br></br>
+                <FormControlLabel
+                    control={
+                    <Switch
+                        checked={this.state.post_process}
+                        onChange={this.handleSwitchPostProcess.bind(this)}
+                        name="checkedB"
+                        color="primary"
+                    />
+                    }
+                    label="Post Processing"
+                />
                 </FormControl>
 
                 <Button 

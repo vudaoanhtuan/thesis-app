@@ -55,6 +55,6 @@ class Predictor(metaclass=Singleton):
     def predict(self, text):
         return self.decoder.predict(text)
 
-    def predict_topk(self, text, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0):
-        return self.decoder.predict_topk(text, beam_size, max_len, pc_min_len, len_norm_alpha, alpha)
+    def predict_topk(self, text, beam_size=10, max_len=50, pc_min_len=0.8, len_norm_alpha=0.0, alpha=0.0, post_process=True, re_scale=True):
+        return self.decoder.predict_topk(text, beam_size, max_len, pc_min_len, len_norm_alpha, alpha, post_process, re_scale)
 

@@ -28,7 +28,9 @@ def get_topk_prediction():
     text = request.json['text']
     lm_alpha = request.json['lm_alpha']
     beam_size = request.json['beam_size']
-    preds = Predictor().predict_topk(text, beam_size=beam_size, alpha=lm_alpha)
+    post_process = request.json['post_process'] if ('post_process' in request.json) else True
+    re_scale = request.json['re_scale'] if ('re_scale' in request.json) else True
+    preds = Predictor().predict_topk(text, beam_size=beam_size, alpha=lm_alpha, post_process=post_process, re_scale=re_scale)
     res = {}
     for i, p in enumerate(preds):
         res[str(i)] = {
